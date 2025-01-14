@@ -5,7 +5,6 @@ local Window = Library:CreateWindow('BLACKTRAP') -- CREATE WINDOW
 local Tab = { -- CREATE TABS
     Tab_1 = Window:addTab('#Home'),
     Tab_Setting = Window:addTab('#Settings'),
-    Tab_Event = Window:addTab('#Events'),
     Tab_2 = Window:addTab('#Main Farm'),
     Tab_SubFarm = Window:addTab('#Subs Farm'),
     Tab_3 = Window:addTab('#Quest'),
@@ -1572,114 +1571,6 @@ spawn(function()
         end)
     end)
 end)
-
-----------------------------------------------------//----------------------------------------------------
---//Events
-local Event_Left = Tab.Tab_Event:addSection()
-
-local EventCandy = Event_Left:addMenu('#Main Events')
-
-local EventTimes = EventCandy:addLabel('')
-spawn(function()
-    while task.wait() do
-        local times = game.Workspace.Countdown.SurfaceGui.TextLabel.Text
-        EventTimes:Refresh('Event Countdown : '.. tostring(times))
-    end
-end)
-
-EventCandy:addToggle('Auto Claim Gift', AutoClaimGift, function(Value)
-    AutoClaimGift = Value
-end)
-spawn(function()
-    while task.wait() do
-        if AutoClaimGift then
-            for i,v in pairs(game.Workspace._WorldOrigin:GetChildren()) do
-                if v.Name == 'Present' then
-                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Root.CFrame
-                    wait(.1)
-                    game:service('VirtualInputManager'):SendKeyEvent(true, "E", false, game)
-                    wait(.1)
-                    game:service('VirtualInputManager'):SendKeyEvent(false, "E", false, game)
-                end
-            end
-        end
-    end
-end)
-
-EventCandy:addToggle('Auto Store Gift', AutoStoreGift, function(Value)
-    AutoStoreGift = Value
-end)
-spawn(function()
-    while task.wait() do
-        if AutoStoreGift then
-            pcall(function()
-                for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
-                    if v:IsA('Tool') then
-                        if string.find(v.Name, 'Gift') then
-                            EquipTool(v.Name)
-                        end
-                    end
-                end
-                wait()
-                for i,v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
-                    if v:IsA('Tool') then
-                        if string.find(v.Name, 'Gift') then
-                            game.Players.LocalPlayer.Character:FindFirstChild(v.Name).ConsumeEvent:InvokeServer('Display')
-                            wait(.1)
-                            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("StoreHolidayGift")
-                        end
-                    end
-                end
-            end)
-        end
-    end
-end)
-
-EventCandy:addToggle('Auto Open Gift', AutoOpenGift, function(Value)
-    AutoOpenGift = Value
-end)
-spawn(function()
-    while task.wait() do
-        if AutoOpenGift then
-            pcall(function()
-                for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
-                    if v:IsA('Tool') then
-                        if string.find(v.Name, 'Gift') then
-                            EquipTool(v.Name)
-                        end
-                    end
-                end
-                wait()
-                for i,v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
-                    if v:IsA('Tool') then
-                        if string.find(v.Name, 'Gift') then
-                            game.Players.LocalPlayer.Character:FindFirstChild(v.Name).ConsumeEvent:InvokeServer('Display')
-                            wait(.1)
-                            game.Players.LocalPlayer.Character:FindFirstChild(v.Name).ConsumeEvent:InvokeServer()
-                        end
-                    end
-                end
-            end)
-        end
-    end
-end)
-
-if First_Sea then
-    EventCandy:addButton('Teleport to Events', function()
-        Tween(CFrame.new(1548.74683, 52.8306961, -2983.6748, -0.866007447, 0, -0.500031412, 0, 1, 0, 0.500031412, 0, -0.866007447))
-    end)
-end
-if Second_Sea then
-    EventCandy:addButton('Teleport to Events', function()
-        Tween(CFrame.new(-6142.04199, 52.8306923, 1797.99512, -0.906296611, 0, -0.422642082, 0, 1, 0, 0.422642082, 0, -0.906296611))
-    end)
-end
-if Third_Sea then
-    EventCandy:addButton('Teleport to Events', function()
-        Tween(CFrame.new(-1095.96472, 64.4006958, -14519.3809, 0.763202608, 7.23753928e-08, 0.646159291, -2.14145039e-08, 1, -8.671514e-08, -0.646159291, 5.23440384e-08, 0.763202608))
-    end)
-
-end
 
 --// SETTING ELFT
 local Setting_Left = Tab.Tab_Setting:addSection()
